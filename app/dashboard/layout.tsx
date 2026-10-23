@@ -9,15 +9,15 @@ export default function DashboardLayout({
 }) {
 
   const navItems = [
-    { label: 'Dashboard', icon: <LayoutDashboard data-icon="inline-start" /> },
-    { label: 'Users', icon: <Users data-icon="inline-start" />, admin: true },
-    { label: 'Excels', icon: <Files data-icon="inline-start" /> },
+    { path: '/dashboard/info', label: 'Dashboard', icon: <LayoutDashboard data-icon="inline-start" /> },
+    { path: '/dashboard/users', label: 'Users', icon: <Users data-icon="inline-start" />, admin: true },
+    { path: '/dashboard/excels', label: 'Excels', icon: <Files data-icon="inline-start" /> },
   ]
 
   const navItemsAside = [
-    { label: 'Dashboard', icon: <LayoutDashboard className="size-4" /> },
-    { label: 'Users', icon: <Users className="size-4" />, admin: true },
-    { label: 'Excels', icon: <Files className="size-4" /> },
+    { path: '/dashboard/info', label: 'Dashboard', icon: <LayoutDashboard className="size-4" /> },
+    { path: '/dashboard/users', label: 'Users', icon: <Users className="size-4" />, admin: true },
+    { path: '/dashboard/excels', label: 'Excels', icon: <Files className="size-4" /> },
   ]
 
   return (
@@ -26,7 +26,9 @@ export default function DashboardLayout({
         <Aside navItems={navItemsAside} />
         <div className="lg:pl-64">
           <Header navItems={navItems} />
-          {children}
+          <main className="mx-auto max-w-400 p-5 sm:p-8">
+            {children}
+          </main>
         </div>
       </div>
     </>

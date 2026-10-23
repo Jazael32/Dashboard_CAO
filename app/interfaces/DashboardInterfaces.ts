@@ -5,6 +5,7 @@ export interface User {
 }
 
 export interface NavItem {
+  path: string;
   label: string;
   icon: React.JSX.Element; // O React.ElementType / React.ComponentType si usas otra librería
   admin?: boolean;  // El '?' indica que es opcional

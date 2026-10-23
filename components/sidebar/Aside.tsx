@@ -1,15 +1,17 @@
 'use client';
 
 import { FileSpreadsheet, Settings } from 'lucide-react'
-import { useState } from 'react'
+import { useReducer } from 'react'
 import { Button } from '../ui/button'
 import { Separator } from '../ui/separator'
 import { Badge } from '../ui/badge'
 import { Avatar, AvatarFallback } from '../ui/avatar'
 import { NavItems } from '@/app/interfaces/DashboardInterfaces'
+import { dashboardReducer, initialState } from '@/app/reducers/DashboardReducer';
+import Link from 'next/link';
 
 export const Aside = ({ navItems }: NavItems) => {
-  const [activeSection, setActiveSection] = useState('Dashboard')
+  const [state, dispatch] = useReducer(dashboardReducer, initialState);
 
   return (
     <>
@@ -24,10 +26,13 @@ export const Aside = ({ navItems }: NavItems) => {
             <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Workspace</p>
             <nav className="flex flex-col gap-1">
               {navItems.map((item) =>
-                <button key={item.label}
-                  onClick={() => setActiveSection(item.label)}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${activeSection === item.label ? 'bg-secondary font-medium text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>
-                  {item.icon}{item.label}{item.admin && <Badge className="ml-auto text-[10px]" variant="outline">Admin</Badge>}</button>)}
+                <Link key={item.label}
+                  href={item.path}
+                  onClick={() => dispatch({ type: 'SET_ACTIVE_SECTION', payload: item.label })}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${state.activeSection === item.label ? 'bg-secondary font-medium text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>
+                  {item.icon}{item.label}{item.admin && <Badge className="ml-auto text-[10px]" variant="outline">Admin</Badge>}
+                </Link>
+              )}
             </nav>
           </div>
           <div>
