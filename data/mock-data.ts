@@ -29,9 +29,17 @@ export const chartConfig = {
   revenue: { label: 'Revenue', color: 'var(--chart-2)' },
   orders: { label: 'Orders', color: 'var(--chart-1)' },
 }
+
 export const channelConfig = {
   direct: { label: 'Direct', color: 'var(--chart-2)' },
   organic: { label: 'Organic', color: 'var(--chart-3)' },
   referral: { label: 'Referral', color: 'var(--chart-4)' },
   paid: { label: 'Paid', color: 'var(--chart-5)' },
 }
+
+export const dashboardCardsData = [
+  { label: 'Total revenue', change: '+12.8%', value: '$284,690', details: 'vs. previous period' },
+  { label: 'Total orders', change: '+8.2%', value: '8,429', details: 'vs. previous period' },
+  { label: 'Active workbooks', change: '+2', value: '12', details: 'this month' },
+  { label: 'Data rows', change: '+18.4%', value: '24,681', details: 'across all workbooks' },
+]

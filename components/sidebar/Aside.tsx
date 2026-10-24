@@ -1,24 +1,25 @@
 'use client';
 
 import { FileSpreadsheet, Settings } from 'lucide-react'
-import { useReducer } from 'react'
+import { usePathname } from 'next/navigation'
 import { Button } from '../ui/button'
 import { Separator } from '../ui/separator'
 import { Badge } from '../ui/badge'
 import { Avatar, AvatarFallback } from '../ui/avatar'
 import { NavItems } from '@/app/interfaces/DashboardInterfaces'
-import { dashboardReducer, initialState } from '@/app/reducers/DashboardReducer';
 import Link from 'next/link';
+import { getActiveItem } from '@/lib/navigation';
 
 export const Aside = ({ navItems }: NavItems) => {
-  const [state, dispatch] = useReducer(dashboardReducer, initialState);
+  const pathname = usePathname();
+  const activeItem = getActiveItem(navItems, pathname);
 
   return (
     <>
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 border-r bg-background lg:flex lg:flex-col">
         <div className="flex h-20 items-center gap-3 px-7">
           <div className="flex size-9 items-center justify-center rounded-xl bg-foreground text-background"><FileSpreadsheet /></div>
-          <div><p className="font-semibold tracking-tight">Sheetwise</p><p className="text-xs text-muted-foreground">Data workspace</p></div>
+          <div><p className="font-semibold tracking-tight">CAO</p><p className="text-xs text-muted-foreground">CAO Dashboard</p></div>
         </div>
         <Separator />
         <div className="flex flex-1 flex-col gap-8 px-4 py-7">
@@ -28,8 +29,7 @@ export const Aside = ({ navItems }: NavItems) => {
               {navItems.map((item) =>
                 <Link key={item.label}
                   href={item.path}
-                  onClick={() => dispatch({ type: 'SET_ACTIVE_SECTION', payload: item.label })}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${state.activeSection === item.label ? 'bg-secondary font-medium text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${activeItem?.path === item.path ? 'bg-secondary font-medium text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>
                   {item.icon}{item.label}{item.admin && <Badge className="ml-auto text-[10px]" variant="outline">Admin</Badge>}
                 </Link>
               )}

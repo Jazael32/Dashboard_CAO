@@ -14,3 +14,13 @@ export interface NavItem {
 export interface NavItems {
   navItems: NavItem[];
 }
+
+export interface WorkBook {
+  id: string;
+  name: string;
+  file: string;
+  rows: string;
+  updated: string;
+  size: string;
+  color: string;
+}
