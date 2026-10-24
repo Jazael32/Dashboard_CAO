@@ -11,6 +11,7 @@ import { DashboardTable } from "@/components/info/DashboardTable";
 import { DashboardPieChart } from "@/components/info/DashboardPieChart";
 import { DashboardCards } from "@/components/info/DashboardCards";
 import { DashboardChart } from "@/components/info/DashboardChart";
+import Link from "next/link";
 
 export default function InfoPage() {
   const [state, dispatch] = useReducer(dashboardReducer, initialState)
@@ -44,9 +45,11 @@ export default function InfoPage() {
             </SelectContent>
           </Select>
           <input ref={uploadInput} type="file" accept=".xlsx" className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadWorkbook(file); event.target.value = '' }} />
-          <Button onClick={() => dispatch({ type: 'SET_ACTIVE_SECTION', payload: 'Excels' })}>
-            <Upload data-icon="inline-start" />Upload Excel
-          </Button>
+          <Link href={'/dashboard/excels'}>
+            <Button>
+              <Upload data-icon="inline-start" />Upload Excel
+            </Button>
+          </Link>
         </div>
       </div>
 
