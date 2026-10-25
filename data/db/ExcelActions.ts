@@ -1,0 +1,60 @@
+"use server";
+import { db } from "@/src/prisma/db";
+
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
+export type JsonRow = Record<string, JsonValue>;
+
+const Dataset = db.orm.public.Dataset;
+
+export async function saveDataset(
+  name: string,
+  columns: string[],
+  rows: JsonRow[],
+) {
+  const created = await Dataset.create({ name, columns, rows });
+  return { id: created.id };
+}
+
+export async function getDataset(id: string) {
+  const dataset = await Dataset.where({ id }).first();
+  if (!dataset) return null;
+
+  return {
+    id: dataset.id,
+    name: dataset.name,
+    columns: dataset.columns as string[],
+    rows: dataset.rows as Record<string, unknown>[],
+    createdAt: dataset.createdAt.epochMilliseconds,
+    updatedAt: dataset.updatedAt.epochMilliseconds,
+  };
+}
+
+
+export async function updateRows(id: string, rows: JsonRow[]) {
+  await Dataset.where({ id }).update({ rows });
+}
+
+export async function deleteDataset(id: string) {
+  await Dataset.where({ id }).delete();
+}
+
+export async function listDatasets() {
+  const list = await Dataset
+    .select("id", "name", "updatedAt")
+    .orderBy((d) => d.updatedAt.desc())
+    .all();
+
+  // Temporal.Instant no se puede enviar a un Client Component, lo paso a número
+  return list.map((d) => ({
+    id: d.id,
+    name: d.name,
+    updatedAt: d.updatedAt.epochMilliseconds,
+  }));
+}
