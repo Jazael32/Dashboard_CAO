@@ -1,0 +1,18 @@
+// use prisma-8
+model User {
+  id        Int                        @id @default(autoincrement())
+  email     String                     @unique
+  username  String?
+  name      String?
+  createdAt TimestamptzString          @default(now())
+  updatedAt temporal.updatedAtString()
+}
+
+model Dataset {
+  id        Uuid                 @id @onCreate(uuid())
+  name      String
+  columns   Jsonb
+  rows      Jsonb
+  createdAt DateTime             @default(now())
+  updatedAt temporal.updatedAt()
+}
