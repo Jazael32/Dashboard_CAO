@@ -1,6 +1,8 @@
 import { Aside } from "@/components/sidebar/Aside";
 import { Header } from "@/components/sidebar/Header";
 import { Files, LayoutDashboard, Users } from "lucide-react";
+import { requireUser } from "../actions/auth";
+import { Suspense } from "react";
 
 export default function DashboardLayout({
   children
@@ -27,7 +29,7 @@ export default function DashboardLayout({
         <div className="lg:pl-64">
           <Header navItems={navItems} />
           <main className="mx-auto max-w-400 p-5 sm:p-8">
-            {children}
+            <Suspense fallback={<p>Cargando...</p>}>{children}</Suspense>
           </main>
         </div>
       </div>
