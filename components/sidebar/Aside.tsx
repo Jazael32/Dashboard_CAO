@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback } from '../ui/avatar'
 import { NavItems } from '@/app/interfaces/DashboardInterfaces'
 import Link from 'next/link';
 import { getActiveItem } from '@/lib/navigation';
+import { logout } from "@/app/actions/auth";
 
 export const Aside = ({ navItems }: NavItems) => {
   const pathname = usePathname();
@@ -53,7 +54,9 @@ export const Aside = ({ navItems }: NavItems) => {
             <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{'Jazael'}</p>
               <p className="truncate text-xs text-muted-foreground">{true ? 'Admin' : 'User'}</p>
             </div>
-            <Button variant="ghost" size="sm" onClick={(e) => console.log('click')}>Log out</Button>
+            <form action={logout}>
+              <Button type="submit" variant="ghost" size="sm">Log out</Button>
+            </form>
           </div>
         </div>
       </aside>

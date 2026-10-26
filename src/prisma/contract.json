@@ -93,7 +93,7 @@
               "createdAt": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/timestamptz-string@1",
+                  "codecId": "pg/timestamptz-temporal@1",
                   "kind": "scalar"
                 }
               },
@@ -118,10 +118,17 @@
                   "kind": "scalar"
                 }
               },
+              "passwordHash": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "updatedAt": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/timestamptz-string@1",
+                  "codecId": "pg/timestamptz-temporal@1",
                   "kind": "scalar"
                 }
               },
@@ -147,6 +154,9 @@
                 },
                 "name": {
                   "column": "name"
+                },
+                "passwordHash": {
+                  "column": "passwordHash"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -217,7 +227,7 @@
             "User": {
               "columns": {
                 "createdAt": {
-                  "codecId": "pg/timestamptz-string@1",
+                  "codecId": "pg/timestamptz-temporal@1",
                   "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
@@ -244,8 +254,13 @@
                   "dataType": "pg/text",
                   "nullable": true
                 },
+                "passwordHash": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
                 "updatedAt": {
-                  "codecId": "pg/timestamptz-string@1",
+                  "codecId": "pg/timestamptz-temporal@1",
                   "dataType": "pg/timestamptz",
                   "nullable": false
                 },
@@ -276,10 +291,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "7a5e282e922e3a2fee3a2ee4846cb334207d5ac73de94b71a580ace43b748ee6"
+    "storageHash": "f8ec5cde24cd08d3a8cff62fad72c18a8d12ec1cc6498bbb0938b013e1861079"
   },
   "execution": {
-    "executionHash": "cade9c312c540acf69f569f8b7271c218571ab981a2ec62bebb7c64a6a69e17c",
+    "executionHash": "2cdd05a7c6e828006fed0fbcfb767d70c8892b8541fb6afc2ca23360bf448304",
     "mutations": {
       "defaults": [
         {
@@ -310,11 +325,11 @@
         },
         {
           "onCreate": {
-            "id": "timestamptzStringNow",
+            "id": "instantNow",
             "kind": "generator"
           },
           "onUpdate": {
-            "id": "timestamptzStringNow",
+            "id": "instantNow",
             "kind": "generator"
           },
           "ref": {
