@@ -3,14 +3,16 @@
 import { Upload } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useDataset } from './ExcelProvider';
-import { useRef } from 'react';
+import { InputEvent, useRef, useState } from 'react';
+import { UploadModal } from './UploadModal';
 
 export function UploadInput() {
-  const { onFileChange } = useDataset();
+  const { uploadWorkbook } = useDataset();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isOpen, setIsOpen] = useState(false)
   return (
     <>
-      <input
+      {/* <input
         ref={inputRef}
         type="file"
         accept=".xlsx, .xls, .csv"
@@ -20,7 +22,17 @@ export function UploadInput() {
       <Button type="button" onClick={() => inputRef.current?.click()}>
         <Upload data-icon="inline-start" />
         Upload workbook
+      </Button> */}
+
+      <Button onClick={() => setIsOpen(true)}>
+        <Upload data-icon="inline-start" />Upload workbook
       </Button>
+
+      {
+        isOpen &&
+        <UploadModal isOpen={isOpen} setIsOpen={setIsOpen} />
+      }
+
     </>
   );
 }

@@ -12,8 +12,15 @@ import { datasetReducer, initialDatasetState } from './DatasetReducer';
 import { exportRowsToXlsx } from '@/lib/exportExcel';
 
 // Configuración del parser: un solo lugar para cambiarla
-const HEADER_KEYWORD = 'C.A.';
-const STOP_ON_EMPTY_COLUMN = 'C.A.';
+// const HEADER_KEYWORD = 'C.A.';
+// const STOP_ON_EMPTY_COLUMN = 'C.A.';
+
+export type UploadWorkbookParams = {
+  file: File;
+  name: string;
+  tableHeader: string;
+  stopOnColumn: string;
+};
 
 export function useDatasetWorkspace() {
 
@@ -31,42 +38,32 @@ export function useDatasetWorkspace() {
     refreshSaved();
   }, [refreshSaved]);
 
-  const onFileChange = useCallback(
-    async (e: ChangeEvent<HTMLInputElement>) => {
-      const input = e.target;
-      const file = input.files?.[0];
-      if (!file) return;
-
+  const uploadWorkbook = useCallback(
+    async ({ file, name, tableHeader, stopOnColumn }: UploadWorkbookParams) => {
       dispatch({ type: 'LOADING', value: true });
+      dispatch({ type: 'ERROR', message: null });
+
       try {
         const result = await parseExcelAdvanced(
           file,
           undefined,
-          HEADER_KEYWORD,
-          STOP_ON_EMPTY_COLUMN,
+          tableHeader,
+          stopOnColumn,
         );
 
         // La tabla se muestra de inmediato
         dispatch({ type: 'TABLE_PARSED', headers: result.headers, data: result.data });
 
-        // Y se guarda en la base de datos
-        try {
-          const { id } = await saveDataset(file.name, result.headers, result.data);
-          dispatch({ type: 'TABLE_SAVED', id });
-          await refreshSaved();
-        } catch (saveErr) {
-          console.error(saveErr);
-          dispatch({
-            type: 'ERROR',
-            message: 'The file was parsed, but it could not be saved to the database.',
-          });
-        }
+        // Y se guarda en la base de datos con el nombre que eligió el usuario
+        const { id } = await saveDataset(name, result.headers, result.data);
+        dispatch({ type: 'TABLE_SAVED', id });
+        await refreshSaved();
       } catch (err) {
         console.error(err);
-        dispatch({ type: 'ERROR', message: 'Error parsing Excel file.' });
+        dispatch({ type: 'ERROR', message: 'Error parsing or saving the Excel file.' });
+        throw err; // el modal lo captura para NO cerrarse y mostrar el error
       } finally {
         dispatch({ type: 'LOADING', value: false });
-        input.value = ''; // permite volver a subir el mismo archivo
       }
     },
     [refreshSaved],
@@ -129,7 +126,7 @@ export function useDatasetWorkspace() {
 
   return {
     ...state,
-    onFileChange,
+    uploadWorkbook,
     openDataset,
     removeDataset,
     downloadDataset,
