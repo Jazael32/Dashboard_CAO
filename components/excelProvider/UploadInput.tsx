@@ -2,13 +2,10 @@
 
 import { Upload } from 'lucide-react';
 import { Button } from '../ui/button';
-import { useDataset } from './ExcelProvider';
-import { InputEvent, useRef, useState } from 'react';
+import { useState } from 'react';
 import { UploadModal } from './UploadModal';
 
 export function UploadInput() {
-  const { uploadWorkbook } = useDataset();
-  const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false)
   return (
     <>

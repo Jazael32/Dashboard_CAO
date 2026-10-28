@@ -14,6 +14,8 @@ model Dataset {
   name      String
   columns   Jsonb
   rows      Jsonb
+  profile   Jsonb?
+  mapping   Jsonb?
   createdAt DateTime             @default(now())
   updatedAt temporal.updatedAt()
 }

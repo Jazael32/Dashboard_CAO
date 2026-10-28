@@ -55,7 +55,7 @@ export function useDatasetWorkspace() {
         dispatch({ type: 'TABLE_PARSED', headers: result.headers, data: result.data });
 
         // Y se guarda en la base de datos con el nombre que eligió el usuario
-        const { id } = await saveDataset(name, result.headers, result.data);
+        const { id } = await saveDataset(name, result.headers, result.data, result.profile);
         dispatch({ type: 'TABLE_SAVED', id });
         await refreshSaved();
       } catch (err) {

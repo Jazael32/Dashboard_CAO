@@ -20,11 +20,6 @@ export default function InfoPage() {
   // Obtener el workbook actual seleccionado (o usar uno por defecto si es 'all')
   const workbook = workbooks.find(w => w.id === state.selectedWorkbook) || workbooks[0];
 
-  const uploadWorkbook = (file: File) => {
-    console.log("Subiendo archivo:", file.name);
-    // Lógica para subir archivo
-  };
-
   return (
     <>
       <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
@@ -44,7 +39,6 @@ export default function InfoPage() {
               </SelectItem>)}
             </SelectContent>
           </Select>
-          <input ref={uploadInput} type="file" accept=".xlsx" className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadWorkbook(file); event.target.value = '' }} />
           <Link href={'/dashboard/excels'}>
             <Button>
               <Upload data-icon="inline-start" />Upload Excel

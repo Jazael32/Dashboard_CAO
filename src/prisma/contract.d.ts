@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'f8ec5cde24cd08d3a8cff62fad72c18a8d12ec1cc6498bbb0938b013e1861079'>;
+  StorageHashBase<'b7727407e86bc570c7e9f4d551475174db96d714ef7564774d4da912feb6f472'>;
 export type ExecutionHash =
   ExecutionHashBase<'2cdd05a7c6e828006fed0fbcfb767d70c8892b8541fb6afc2ca23360bf448304'>;
 export type ProfileHash =
@@ -274,7 +274,9 @@ export namespace Models {
     columns: FieldOutputTypes['public']['Dataset']['columns'];
     createdAt: FieldOutputTypes['public']['Dataset']['createdAt'];
     id: FieldOutputTypes['public']['Dataset']['id'];
+    mapping: FieldOutputTypes['public']['Dataset']['mapping'];
     name: FieldOutputTypes['public']['Dataset']['name'];
+    profile: FieldOutputTypes['public']['Dataset']['profile'];
     rows: FieldOutputTypes['public']['Dataset']['rows'];
     updatedAt: FieldOutputTypes['public']['Dataset']['updatedAt'];
     readonly [RelationKeys]?: never;
@@ -337,10 +339,22 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
+                readonly mapping: {
+                  readonly dataType: 'pg/jsonb';
+                  readonly codecId: 'pg/jsonb@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
                 readonly name: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly profile: {
+                  readonly dataType: 'pg/jsonb';
+                  readonly codecId: 'pg/jsonb@1';
+                  readonly nullable: true;
                   readonly many: false;
                 };
                 readonly rows: {
@@ -451,9 +465,17 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
               };
+              readonly mapping: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/jsonb@1' };
+              };
               readonly name: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly profile: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/jsonb@1' };
               };
               readonly rows: {
                 readonly nullable: false;
@@ -475,7 +497,9 @@ type ContractBase = Omit<
                 readonly columns: { readonly column: 'columns' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly id: { readonly column: 'id' };
+                readonly mapping: { readonly column: 'mapping' };
                 readonly name: { readonly column: 'name' };
+                readonly profile: { readonly column: 'profile' };
                 readonly rows: { readonly column: 'rows' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };

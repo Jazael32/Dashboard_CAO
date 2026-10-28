@@ -1,10 +1,14 @@
 import * as XLSX from 'xlsx';
+import { normalizeCell } from './normalize';
+import { profileColumns } from '@/lib/dataset/profile';
+import type { ColumnProfile } from '@/lib/dataset/types';
 
 export interface AdvancedParsedExcel {
   sheetNames: string[];
   headers: string[];
   data: Record<string, any>[];
   headerRowIndex: number;
+  profile: ColumnProfile[];
 }
 
 export async function parseExcelAdvanced(
@@ -13,8 +17,9 @@ export async function parseExcelAdvanced(
   headerKeyword?: string,
   stopOnEmptyColumn?: string
 ): Promise<AdvancedParsedExcel> {
+
   const buffer = await file.arrayBuffer();
-  const workbook = XLSX.read(buffer, { type: 'array' });
+  const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
   const sheetNames = workbook.SheetNames;
 
   const targetSheetName = sheetName || sheetNames[0];
@@ -24,15 +29,15 @@ export async function parseExcelAdvanced(
     throw new Error(`Sheet "${targetSheetName}" not found.`);
   }
 
-  // 1. Convert worksheet into a 2D array of rows
+  // 1. Hoja -> matriz 2D
   const rawRows: any[][] = XLSX.utils.sheet_to_json(worksheet, {
     header: 1,
     defval: ''
   });
 
-  let headerRowIndex = -1;
 
-  // 2. Scan rows to find the headers
+  // 2. Buscar la fila de headers
+  let headerRowIndex = -1;
   for (let i = 0; i < rawRows.length; i++) {
     const row = rawRows[i];
 
@@ -57,10 +62,16 @@ export async function parseExcelAdvanced(
     throw new Error('Could not automatically find a valid header row in the spreadsheet.');
   }
 
-  // 3. Extract and clean headers
+  // 3. Headers limpios y sin duplicados mismo "name" name, name1, name2, etc.
+  const seen = new Map<string, number>();
   const headerCols = rawRows[headerRowIndex]
     .map((cell, index) => ({ name: String(cell).trim(), index }))
-    .filter((col) => col.name);
+    .filter((col) => col.name)
+    .map((col) => {
+      const count = seen.get(col.name) ?? 0;
+      seen.set(col.name, count + 1);
+      return count === 0 ? col : { ...col, name: `${col.name} (${count + 1})` };
+    });
 
   const headers = headerCols.map((col) => col.name);
 
@@ -81,7 +92,7 @@ export async function parseExcelAdvanced(
       }
     }
 
-    // Skip entirely blank rows
+    // Saltar filas vacias
     if (row.every((cell) => cell === '' || cell == null)) {
       continue;
     }
@@ -89,18 +100,17 @@ export async function parseExcelAdvanced(
     // Map row cells using the original index
     const obj: Record<string, any> = {};
     for (const { name, index } of headerCols) {
-      const value = row[index];
-      obj[name] = value instanceof Date ? value.toISOString() : (value ?? '');
+      obj[name] = normalizeCell(row[index]);
     }
 
     data.push(obj);
   }
-  console.log(data);
 
   return {
     sheetNames,
     headers,
     data,
-    headerRowIndex
+    headerRowIndex,
+    profile: profileColumns(headers, data)
   };
 }
