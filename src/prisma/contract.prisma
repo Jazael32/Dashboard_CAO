@@ -15,6 +15,7 @@ model Dataset {
   columns   Jsonb
   rows      Jsonb
   profile   Jsonb?
+  widgets   Jsonb?
   mapping   Jsonb?
   createdAt DateTime             @default(now())
   updatedAt temporal.updatedAt()

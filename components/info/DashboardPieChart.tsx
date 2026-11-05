@@ -1,47 +1,50 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../ui/chart'
-import { Pie, PieChart } from 'recharts'
-import { channelConfig, channelData } from '@/data/mock-data'
+import { useMemo } from 'react';
+import { Pie, PieChart } from 'recharts';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '../ui/chart';
 
-export const DashboardPieChart = () => {
+interface DashboardPieChartProps {
+  title: string;
+  data: { name: string; value: number }[];
+}
+
+const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)', 'var(--muted-foreground)'];
+const config = { value: { label: 'Value' } } satisfies ChartConfig;
+
+export const DashboardPieChart = ({ title, data }: DashboardPieChartProps) => {
+  const items = useMemo(
+    () => data.map((d, i) => ({ ...d, fill: COLORS[i % COLORS.length] })),
+    [data],
+  );
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sales by channel</CardTitle>
-        <CardDescription>Where your revenue is coming from.</CardDescription>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>Top categories.</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={channelConfig} className="mx-auto h-55 max-w-70">
+        <ChartContainer config={config} className="mx-auto h-55 max-w-70">
           <PieChart>
-            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-            <Pie
-              data={channelData}
-              dataKey="value"
-              nameKey="channel"
-              innerRadius={62}
-              outerRadius={90}
-              strokeWidth={4}
-            />
+            <ChartTooltip content={<ChartTooltipContent hideLabel nameKey="name" />} />
+            <Pie data={items} dataKey="value" nameKey="name" innerRadius={62} outerRadius={90} strokeWidth={4} />
           </PieChart>
         </ChartContainer>
 
         <div className="grid grid-cols-2 gap-3 pt-2">
-          {channelData.map((item) => (
-            <div key={item.channel} className="flex items-center justify-between text-xs">
-              <span className="flex items-center gap-2 text-muted-foreground">
-                <i
-                  className="size-2 rounded-full"
-                  style={{ backgroundColor: channelConfig[item.channel as keyof typeof channelConfig]?.color }}
-                />
-                {channelConfig[item.channel as keyof typeof channelConfig]?.label ?? item.channel}
+          {items.map((item) => (
+            <div key={item.name} className="flex items-center justify-between gap-2 text-xs">
+              <span className="flex min-w-0 items-center gap-2 text-muted-foreground">
+                <i className="size-2 shrink-0 rounded-full" style={{ backgroundColor: item.fill }} />
+                <span className="truncate">{item.name}</span>
               </span>
-              <span className="font-medium">{item.value}%</span>
+              <span className="font-medium">{item.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
             </div>
           ))}
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};

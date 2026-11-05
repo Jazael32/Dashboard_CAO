@@ -74,6 +74,13 @@
                   "codecId": "pg/timestamptz-temporal@1",
                   "kind": "scalar"
                 }
+              },
+              "widgets": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/jsonb@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {},
@@ -102,6 +109,9 @@
                 },
                 "updatedAt": {
                   "column": "updatedAt"
+                },
+                "widgets": {
+                  "column": "widgets"
                 }
               },
               "namespaceId": "public",
@@ -243,6 +253,11 @@
                   "codecId": "pg/timestamptz-temporal@1",
                   "dataType": "pg/timestamptz",
                   "nullable": false
+                },
+                "widgets": {
+                  "codecId": "pg/jsonb@1",
+                  "dataType": "pg/jsonb",
+                  "nullable": true
                 }
               },
               "foreignKeys": [],
@@ -321,7 +336,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "b7727407e86bc570c7e9f4d551475174db96d714ef7564774d4da912feb6f472"
+    "storageHash": "c16ef7d0b28a59341d7960e41d4158c021a98fa2e22a14fbe9fd73e884595728"
   },
   "execution": {
     "executionHash": "2cdd05a7c6e828006fed0fbcfb767d70c8892b8541fb6afc2ca23360bf448304",

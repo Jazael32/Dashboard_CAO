@@ -1,67 +1,129 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
-import { Download, Search } from 'lucide-react'
-import { Input } from '../ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
-import { Badge } from '../ui/badge'
-import { Button } from '../ui/button'
-import { recentRows, workbooks } from '@/data/mock-data'
-import { dashboardReducer, initialState } from '@/app/reducers/DashboardReducer'
-import { useReducer } from 'react'
+import { useMemo } from 'react';
+import {
+  useTable,
+  tableFeatures,
+  columnFilteringFeature,
+  globalFilteringFeature,
+  rowPaginationFeature,
+  createFilteredRowModel,
+  createPaginatedRowModel,
+  filterFn_includesString,
+  FlexRender,
+  type ColumnDef,
+} from '@tanstack/react-table';
+import { Search } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
-export const DashboardTable = () => {
-  const [state, dispatch] = useReducer(dashboardReducer, initialState)
+type Row = Record<string, unknown>;
 
-  // Obtener el workbook actual seleccionado (o usar uno por defecto si es 'all')
-  const workbook = workbooks.find(w => w.id === state.selectedWorkbook) || workbooks[0];
+// Se define FUERA del componente para que sea estable entre renders
+const features = tableFeatures({
+  columnFilteringFeature,
+  globalFilteringFeature,
+  rowPaginationFeature,
+  filteredRowModel: createFilteredRowModel(),
+  paginatedRowModel: createPaginatedRowModel(),
+  filterFns: { includesString: filterFn_includesString },
+});
 
-  const filteredRows = recentRows.filter(row =>
-    row.customer.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
-    row.product.toLowerCase().includes(state.searchTerm.toLowerCase())
+interface DashboardTableProps {
+  name: string;
+  columns: string[];
+  rows: Row[];
+}
+
+function formatCell(value: unknown) {
+  if (typeof value === 'number') return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  return String(value ?? '');
+}
+
+export const DashboardTable = ({ name, columns, rows }: DashboardTableProps) => {
+  const tableColumns = useMemo<ColumnDef<typeof features, Row>[]>(
+    () =>
+      columns.map((c) => ({
+        id: c,
+        accessorFn: (row: Row) => row[c],
+        header: c,
+        cell: ({ cell }) => formatCell(cell.getValue()),
+      })),
+    [columns],
   );
+
+  const table = useTable({
+    features,
+    columns: tableColumns,
+    data: rows,
+    globalFilterFn: 'includesString',
+    initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
+  });
+
+  const { pagination, globalFilter } = table.state;
 
   return (
     <Card className="mt-6">
       <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <CardTitle>Recent data</CardTitle>
-          <CardDescription>Rows imported from {workbook.name}.</CardDescription>
+          <CardDescription>Rows imported from {name}.</CardDescription>
         </div>
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={state.searchTerm} onChange={(event) => dispatch({ type: 'SET_SEARCH_TERM', payload: event.target.value })} placeholder="Search rows..." className="pl-9" />
+          <Input
+            value={(globalFilter as string) ?? ''}
+            onChange={(e) => table.setGlobalFilter(e.target.value)}
+            placeholder="Search rows..."
+            className="pl-9"
+          />
         </div>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Region</TableHead>
-                <TableHead>Product</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Action</TableHead>
-              </TableRow>
+              {table.getHeaderGroups().map((hg) => (
+                <TableRow key={hg.id}>
+                  {hg.headers.map((h) => (
+                    <TableHead key={h.id}>
+                      <FlexRender header={h} />
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
             </TableHeader>
             <TableBody>
-              {
-                filteredRows.map((row) =>
-                  <TableRow key={row.customer}>
-                    <TableCell className="font-medium">{row.customer}</TableCell>
-                    <TableCell className="text-muted-foreground">{row.region}</TableCell>
-                    <TableCell>{row.product}</TableCell>
-                    <TableCell>{row.amount}</TableCell>
-                    <TableCell><Badge variant={row.status === 'Complete' ? 'secondary' : 'outline'}>{row.status}</Badge></TableCell>
-                    <TableCell className="text-right"> <Button variant="ghost" size="sm"> <Download data-icon="inline-start" />Download</Button></TableCell>
-                  </TableRow>
-                )}
+              {table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getAllCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      <FlexRender cell={cell} />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>
+
+        <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+          <span>
+            Page {pagination.pageIndex + 1} of {Math.max(table.getPageCount(), 1)} ·{' '}
+            {table.getFilteredRowModel().rows.length} rows
+          </span>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+              Previous
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+              Next
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};

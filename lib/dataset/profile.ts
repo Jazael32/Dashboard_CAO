@@ -1,4 +1,5 @@
-import type { ColumnProfile, ColumnType, DatasetMapping } from './types';
+import type { ColumnProfile, ColumnType } from './types';
+import { parseBool } from './boolean';
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}/;
 
@@ -15,6 +16,8 @@ export function profileColumns(
     let type: ColumnType = 'text';
     if (values.length > 0 && values.every((v) => typeof v === 'number')) {
       type = 'number';
+    } else if (values.length > 0 && values.every((v) => parseBool(v) !== null)) {
+      type = 'boolean';
     } else if (values.length > 0 && values.every((v) => typeof v === 'string' && ISO_DATE.test(v))) {
       type = 'date';
     } else if (unique.size <= 20 || unique.size / Math.max(values.length, 1) < 0.05) {
@@ -28,13 +31,4 @@ export function profileColumns(
       nullCount: rows.length - values.length,
     };
   });
-}
-
-export function suggestMapping(profile: ColumnProfile[]): DatasetMapping {
-  return {
-    dateColumn: profile.find((c) => c.type === 'date')?.name,
-    valueColumn: profile.find((c) => c.type === 'number')?.name,
-    categoryColumn: profile.find((c) => c.type === 'category')?.name,
-    aggregation: 'sum',
-  };
 }

@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'b7727407e86bc570c7e9f4d551475174db96d714ef7564774d4da912feb6f472'>;
+  StorageHashBase<'c16ef7d0b28a59341d7960e41d4158c021a98fa2e22a14fbe9fd73e884595728'>;
 export type ExecutionHash =
   ExecutionHashBase<'2cdd05a7c6e828006fed0fbcfb767d70c8892b8541fb6afc2ca23360bf448304'>;
 export type ProfileHash =
@@ -279,6 +279,7 @@ export namespace Models {
     profile: FieldOutputTypes['public']['Dataset']['profile'];
     rows: FieldOutputTypes['public']['Dataset']['rows'];
     updatedAt: FieldOutputTypes['public']['Dataset']['updatedAt'];
+    widgets: FieldOutputTypes['public']['Dataset']['widgets'];
     readonly [RelationKeys]?: never;
   };
   export type public_User = {
@@ -367,6 +368,12 @@ type ContractBase = Omit<
                   readonly dataType: 'pg/timestamptz';
                   readonly codecId: 'pg/timestamptz-temporal@1';
                   readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly widgets: {
+                  readonly dataType: 'pg/jsonb';
+                  readonly codecId: 'pg/jsonb@1';
+                  readonly nullable: true;
                   readonly many: false;
                 };
               };
@@ -488,6 +495,10 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-temporal@1';
                 };
               };
+              readonly widgets: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/jsonb@1' };
+              };
             };
             readonly relations: Record<string, never>;
             readonly storage: {
@@ -502,6 +513,7 @@ type ContractBase = Omit<
                 readonly profile: { readonly column: 'profile' };
                 readonly rows: { readonly column: 'rows' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
+                readonly widgets: { readonly column: 'widgets' };
               };
             };
           };
