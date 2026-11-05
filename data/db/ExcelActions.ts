@@ -1,6 +1,6 @@
 "use server";
 import { db } from "@/src/prisma/db";
-import type { ColumnProfile, DatasetMapping } from '@/lib/dataset/types';
+import type { ColumnProfile, Widget } from '@/lib/dataset/types';
 import { profileColumns } from '@/lib/dataset/profile';
 
 export type JsonValue =
@@ -22,9 +22,9 @@ export async function saveDataset(
   name: string,
   columns: string[],
   rows: JsonRow[],
-  profile: ColumnProfile[],
+  profile: ColumnProfile[]
 ) {
-  const created = await Dataset.create({ name, columns, rows, profile, mapping: null });
+  const created = await Dataset.create({ name, columns, rows, profile: toJson(profile), widgets: toJson([]) });
   return { id: created.id };
 }
 
@@ -41,12 +41,15 @@ export async function getDataset(id: string) {
     columns,
     rows,
     profile: (dataset.profile as unknown as ColumnProfile[] | null) ?? profileColumns(columns, rows),
-    mapping: dataset.mapping as DatasetMapping | null,
+    widgets: (dataset.widgets as unknown as Widget[] | null) ?? [],
     createdAt: dataset.createdAt.epochMilliseconds,
     updatedAt: dataset.updatedAt.epochMilliseconds,
   };
 }
 
+export async function saveWidgets(id: string, widgets: Widget[]) {
+  await Dataset.where({ id }).update({ widgets: toJson(widgets) });
+}
 
 export async function updateRows(id: string, rows: JsonRow[]) {
   await Dataset.where({ id }).update({ rows });
